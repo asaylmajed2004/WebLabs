@@ -99,33 +99,6 @@
             text-align: left;
             font-size: 20px;
         }
-
-            h1 {
-                font-size: 42px;
-            }
-
-            h2 {
-                font-size: 30px;
-            }
-
-            #likeButton,
-            #dislikeButton {
-                font-size: 35px;
-                padding: 10px 15px;
-                margin: 5px;
-            }
-
-            #comment {
-                width: 95%;
-                height: 150px;
-            }
-
-            #submitButton,
-            #clearButton {
-                font-size: 18px;
-                padding: 12px 25px;
-            }
-        
     </style>
 </head>
 
@@ -177,44 +150,6 @@
                 "; max-age=" + 2 * 24 * 60 * 60;
         }
 
-
-
-     function readCookie(name) {
-
-                let cookies = document.cookie.split(";");
-
-                for (let cookie of cookies) {
-
-                    let parts = cookie.trim().split("=");
-
-                    if (parts[0] === name) {
-                        return decodeURIComponent(parts.slice(1).join("="));
-                    }
-                }
-
-                return null;
-            }
-
-        function removeCookie(name) {
-            document.cookie = name + "=; max-age=0";
-        }
-
-        let likes = Number(readCookie("likesCount"));
-        let dislikes = Number(readCookie("dislikesCount"));
-
-        if (readCookie("likesCount") === null) {
-            likes = 100;
-        }
-
-        if (readCookie("dislikesCount") === null) {
-            dislikes = 20;
-        }
-
-        let vote = readCookie("voteChoice");
-
-        let comments = JSON.parse(readCookie("savedComments") || "[]");
-
-
         function refreshPage() {
 
             likeCount.innerText = likes;
@@ -238,6 +173,40 @@
 
         }
 
+        function readCookie(name) {
+
+            let cookies = document.cookie.split(";");
+
+            for (let cookie of cookies) {
+
+                let parts = cookie.trim().split("=");
+
+                if (parts[0] === name) {
+                    return decodeURIComponent(parts.slice(1).join("="));
+                }
+            }
+
+            return null;
+        }
+
+        function removeCookie(name) {
+            document.cookie = name + "=; max-age=0";
+        }
+
+        let likes = Number(readCookie("likesCount"));
+        let dislikes = Number(readCookie("dislikesCount"));
+
+        if (readCookie("likesCount") === null) {
+            likes = 100;
+        }
+
+        if (readCookie("dislikesCount") === null) {
+            dislikes = 20;
+        }
+
+        let vote = readCookie("voteChoice");
+
+        let comments = JSON.parse(readCookie("savedComments") || "[]");
 
         likeButton.addEventListener("click", function () {
 
