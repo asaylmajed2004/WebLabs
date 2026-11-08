@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 6</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-family: "Times New Roman", serif;
+            font-size: 60px;
+            font-weight: bold;
+            margin: 0 0 35px;
+            color: #222;
+        }
+
+        h2 {
+            font-family: "Times New Roman", serif;
+            font-size: 42px;
+            margin-bottom: 55px;
+            color: #222;
+        }
+
+        #likeButton,
+        #dislikeButton {
+            background-color: #e9e9ed;
+            border: 2px solid #b8b8c2;
+            border-radius: 9px;
+            padding: 10px 35px;
+            margin: 0 10px;
+            font-size: 65px;
+            color: black;
+            cursor: pointer;
+        }
+
+        #likeButton:hover,
+        #dislikeButton:hover {
+            background-color: #dcdce2;
+        }
+
+        #likeButton:disabled,
+        #dislikeButton:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        h3 {
+            font-family: "Times New Roman", serif;
+            font-size: 36px;
+            margin-top: 45px;
+            margin-bottom: 25px;
+        }
+
+        #comment {
+            width: 80%;
+            height: 200px;
+            padding: 20px;
+            font-size: 25px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        #submitButton,
+        #clearButton {
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 18px 40px;
+            margin: 25px 10px;
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        #submitButton:hover,
+        #clearButton:hover {
+            background-color: #333;
+        }
+
+        #submitButton:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #commentsList {
+            width: 80%;
+            margin: 20px auto;
+            text-align: left;
+            font-size: 20px;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 42px;
+            }
+
+            h2 {
+                font-size: 30px;
+            }
+
+            #likeButton,
+            #dislikeButton {
+                font-size: 35px;
+                padding: 10px 15px;
+                margin: 5px;
+            }
+
+            #comment {
+                width: 95%;
+                height: 150px;
+            }
+
+            #submitButton,
+            #clearButton {
+                font-size: 18px;
+                padding: 12px 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Lab 6</h1>
+
+    <h2>Like or dislike</h2>
+
+    <div>
+        <button id="likeButton"> 👍 <span id="likeCount">100</span> </button>
+
+        <button id="dislikeButton">👎<span id="dislikeCount">20</span>
+        </button>
+    </div>
+
+    <h3>Comments</h3>
+
+    <textarea id="comment" placeholder="write a comment..."></textarea>
+
+    <div>
+        <button id="submitButton">Submit</button>
+        <button id="clearButton">Clear</button>
+    </div>
+
+    <div id="commentsList"></div>
+
+    <script>
+
+        let likeButton = document.getElementById("likeButton");
+
+        let dislikeButton = document.getElementById("dislikeButton");
+
+        let likeCount = document.getElementById("likeCount");
+
+        let dislikeCount = document.getElementById("dislikeCount");
+
+        let comment = document.getElementById("comment");
+
+        let submitButton = document.getElementById("submitButton");
+
+        let clearButton = document.getElementById("clearButton");
+
+        let commentsList = document.getElementById("commentsList");
+
+
+        function setCookie(name, value) {
+            document.cookie = name + "=" + encodeURIComponent(value) +
+                "; max-age=" + 2 * 24 * 60 * 60;
+        }
+
+
+
+     function readCookie(name) {
+
+                let cookies = document.cookie.split(";");
+
+                for (let cookie of cookies) {
+
+                    let parts = cookie.trim().split("=");
+
+                    if (parts[0] === name) {
+                        return decodeURIComponent(parts.slice(1).join("="));
+                    }
+                }
+
+                return null;
+            }
+
+        function removeCookie(name) {
+            document.cookie = name + "=; max-age=0";
+        }
+
+        let likes = Number(readCookie("likesCount"));
+        let dislikes = Number(readCookie("dislikesCount"));
+
+        if (readCookie("likesCount") === null) {
+            likes = 100;
+        }
+
+        if (readCookie("dislikesCount") === null) {
+            dislikes = 20;
+        }
+
+        let vote = readCookie("voteChoice");
+
+        let comments = JSON.parse(readCookie("savedComments") || "[]");
+
+
+        function refreshPage() {
+
+            likeCount.innerText = likes;
+            dislikeCount.innerText = dislikes;
+
+            likeButton.disabled = vote !== null;
+            dislikeButton.disabled = vote !== null;
+
+            comment.disabled = comments.length > 0;
+            submitButton.disabled = comments.length > 0;
+
+            commentsList.innerHTML = "";
+
+            comments.forEach(function(comment) {
+                let p = document.createElement("p");
+
+                p.innerText = comment;
+
+                commentsList.appendChild(p);
+            });
+
+        }
+
+
+        likeButton.addEventListener("click", function () {
+
+            if (vote === null) {
+
+                likes++;
+
+                vote = "like";
+                setCookie("likesCount", likes);
+                setCookie("voteChoice", vote);
+
+                refreshPage();
+            }
+
+        });
+
+        dislikeButton.addEventListener("click", function () {
+
+            if (vote === null) {
+
+                dislikes++;
+
+                vote = "dislike";
+                setCookie("dislikesCount", dislikes);
+                setCookie("voteChoice", vote);
+
+                refreshPage();
+            }
+
+        });
+
+        submitButton.addEventListener("click", function () {
+
+            let newComment = comment.value.trim();
+
+            if (newComment !== "" && comments.length === 0) {
+
+                comments.push(newComment);
+                setCookie("savedComments", JSON.stringify(comments));
+
+                comment.value = "";
+
+                refreshPage();
+            }
+
+        });
+
+        clearButton.addEventListener("click", function () {
+
+            removeCookie("likesCount");
+            removeCookie("dislikesCount");
+            removeCookie("voteChoice");
+            removeCookie("savedComments");
+
+            likes = 100;
+            dislikes = 20;
+            vote = null;
+            comments = [];
+
+            comment.value = "";
+
+            refreshPage();
+        });
+
+
+        refreshPage();
+
+    </script>
+
+</body>
+</html>
